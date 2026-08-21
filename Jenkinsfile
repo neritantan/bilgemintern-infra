@@ -6,6 +6,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                // Clean up the workspace before starting the build.
+                cleanWs()
                 // Download the source code from the repository and build the application.
                 sh 'git clone https://github.com/neritantan/bilgemintern-backend.git'
                 // docker build
@@ -38,6 +40,13 @@ pipeline {
                 // SSH to the dev server and deploy the application.
                 sh 'echo "Deploying to dev server..."'
             }
+        }
+    }
+    post {
+        always {
+            sh 'docker stop app || true'
+            sh 'docker rm app || true'
+            sh 'docker rmi bilgemintern-backend:latest || true'
         }
     }
 }
