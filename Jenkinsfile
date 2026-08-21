@@ -17,9 +17,11 @@ pipeline {
             steps {
                 // Run required tests to verify the application is working.
                 sh 'sleep 30' // Wait for the application to start
-                sh 'curl -f localhost:8000'
-            }
-        }   
+                withCredentials([string(credentialsId: 'host-ip', variable: 'HOST_IP')]) {
+                    sh 'curl -f $HOST_IP:8000'
+                }
+            }  
+        }
 
         stage('Push') {
             steps {
