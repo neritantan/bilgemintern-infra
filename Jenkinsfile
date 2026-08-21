@@ -10,14 +10,14 @@ pipeline {
                 // docker build
                 sh 'docker build -t bilgemintern-backend:latest ./bilgemintern-backend'
                 // docker run 
-                sh 'docker run -d --name app -p 80:8000 bilgemintern-backend:latest'
+                sh 'docker run -d --name app -p 8000:8000 bilgemintern-backend:latest'
             }
         }
         stage('Test') {
             steps {
                 // Run required tests to verify the application is working.
                 sh 'sleep 30' // Wait for the application to start
-                sh 'curl -f localhost'
+                sh 'curl -f localhost:8000'
             }
         }   
 
