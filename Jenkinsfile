@@ -1,8 +1,5 @@
 pipeline {
     agent any
-    triggers {
-        // When code gets pushed to the repository. (Gets triggered by the webhook via plugin).
-    }
     stages {
         stage('Build') {
             steps {
