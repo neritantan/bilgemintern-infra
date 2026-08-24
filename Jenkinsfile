@@ -25,9 +25,10 @@ pipeline {
 
         stage('Push') {
             steps {
-                // Upload the application to the GHCR using commit hash as the tag.
-                env.HASH = sh(script: 'cd bilgemintern-backend && git rev-parse --short HEAD', returnStdout: true).trim()
-            
+                script {
+                    // Upload the application to the GHCR using commit hash as the tag.
+                    env.HASH = sh(script: 'cd bilgemintern-backend && git rev-parse --short HEAD', returnStdout: true).trim()
+                }
                 withCredentials([usernamePassword(credentialsId: 'ghcr-login', passwordVariable: 'GHCR_PAT', usernameVariable: 'GHCR_USER')]) {
                     sh 'echo $GHCR_PAT | docker login ghcr.io -u $GHCR_USER --password-stdin'
                     sh 'docker tag bilgemintern-backend:latest ghcr.io/$GHCR_USER/bilgemintern-backend:$HASH'
@@ -42,6 +43,23 @@ pipeline {
             steps {
                 // SSH to the dev server and deploy the application.
                 sh 'echo "Deploying to dev server..."'
+
+                script {
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: 'server-ssh', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                    ]) {
+                        
+                        sh """
+                        ssh -i \$SSH_KEY -o StrictHostKeyChecking=no \$SSH_USER@dev '
+                            docker stop app || true
+                            docker rm app || true
+                            docker pull ghcr.io/neritantan/bilgemintern-backend:${env.HASH}
+                            docker run -d --name app -p 80:8000 ghcr.io/neritantan/bilgemintern-backend:${env.HASH}
+                            docker image prune -a -f --filter "until=24h"
+                        '
+                        """
+                    }
+        }
             }
         }
     }
