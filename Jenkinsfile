@@ -29,10 +29,18 @@ pipeline {
                     // Upload the application to the GHCR using commit hash as the tag.
                     env.HASH = sh(script: 'cd bilgemintern-backend && git rev-parse --short HEAD', returnStdout: true).trim()
                 }
+
                 withCredentials([usernamePassword(credentialsId: 'ghcr-login', passwordVariable: 'GHCR_PAT', usernameVariable: 'GHCR_USER')]) {
                     sh 'echo $GHCR_PAT | docker login ghcr.io -u $GHCR_USER --password-stdin'
-                    sh 'docker tag bilgemintern-backend:latest ghcr.io/$GHCR_USER/bilgemintern-backend:$HASH'
-                    sh 'docker push ghcr.io/$GHCR_USER/bilgemintern-backend:$HASH'
+
+                    script {
+                        def img = "ghcr.io/${env.GHCR_USER}/bilgemintern-backend:${env.HASH}"
+
+                        if (sh(script: "docker manifest inspect ${img} > /dev/null 2>&1", returnStatus: true) != 0) {
+                            sh "docker tag bilgemintern-backend:latest ${img}"
+                            sh "docker push ${img}"
+                        }
+                    }
                 }
 
                 sh 'echo "Pushed to GHCR successfully."'
