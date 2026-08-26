@@ -42,6 +42,7 @@ pipeline {
                         }
                         else {
                             echo "Image ${img} already exists in GHCR. Skipping push."
+                        }
                     }
                 }
 
