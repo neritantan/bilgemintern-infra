@@ -40,6 +40,8 @@ pipeline {
                             sh "docker tag bilgemintern-backend:latest ${img}"
                             sh "docker push ${img}"
                         }
+                        else {
+                            echo "Image ${img} already exists in GHCR. Skipping push."
                     }
                 }
 
