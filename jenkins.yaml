@@ -202,8 +202,18 @@ unclassified:
     hookUrl: "http://${HOST_IP}/github-webhook/"
   globalDefaultFlowDurabilityLevel: {
     }
-  globalLibraries: {
-    }
+  globalLibraries:
+    libraries:
+    - name: "bilgemintern"
+      defaultVersion: "main"
+      allowVersionOverride: true
+      implicit: false
+      includeInChangesets: false
+      retriever:
+        modernSCM:
+          scm:
+            git:
+              remote: "https://github.com/neritantan/bilgemintern-infra.git"
   globalTimeOutConfiguration:
     operations:
     - "abortOperation"
