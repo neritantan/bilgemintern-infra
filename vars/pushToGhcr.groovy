@@ -1,5 +1,3 @@
-// Push a locally built image to GHCR, tagged with the commit hash and latest.
-// Usage: pushToGhcr(image: 'bilgemintern-backend', tag: env.HASH)
 def call(Map cfg) {
     withCredentials([usernamePassword(credentialsId: 'ghcr-login', passwordVariable: 'GHCR_PAT', usernameVariable: 'GHCR_USER')]) {
         sh 'echo $GHCR_PAT | docker login ghcr.io -u $GHCR_USER --password-stdin'
